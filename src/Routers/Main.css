@@ -1,0 +1,40 @@
+/* main */
+
+.main_post_wrap {
+  margin: 0 auto;
+  width: 80%;
+  line-break: auto;
+}
+
+.main_post_bottom_menu span {
+  font-size: 0.8rem;
+  margin-left: 1rem;
+  cursor: pointer;
+}
+
+.main_post_heart_check span {
+  margin-left: 1rem;
+}
+.upImg {
+  cursor: pointer;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  animation: upDown 2.5s infinite;
+  filter: invert(32%) sepia(6%) saturate(1903%) hue-rotate(157deg) brightness(95%) contrast(83%);
+}
+
+@keyframes upDown {
+  0% {
+    bottom: 1rem;
+    opacity: 0;
+  }
+  50% {
+    bottom: 2rem;
+    opacity: 1;
+  }
+  100% {
+    bottom: 1rem;
+    opacity: 0;
+  }
+}
