@@ -6,6 +6,7 @@ import axios from "axios";
 import MainFeed from "../Components/Main/MainFeed";
 import upBtn from "../asset/upBtn.svg";
 import { useSelector } from "react-redux";
+import Loader from "../Components/Main/Loader";
 
 function Main() {
   const [text, setText] = useState();
@@ -24,6 +25,7 @@ function Main() {
   const userId = useSelector((store) => {
     return store.loginState.userId;
   });
+  console.log(userId);
 
   const lastPostRef = useCallback(
     (node) => {
@@ -63,6 +65,7 @@ function Main() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // 댓글 등록
   const addCmt = (cmtList, bIdx) => {
     const newFeed = feed.map((v) => {
       if (v.bid === bIdx) {
@@ -74,17 +77,70 @@ function Main() {
   };
 
   const setCmt = (comment, bIdx) => {
+    console.log(feed);
     const newFeed = feed.map((v) => {
       if (v.bid === bIdx) {
+        console.log(v);
         v.cmt.unshift(comment);
+        console.log(v);
       }
       return v;
     });
     setFeed(newFeed);
   };
+
+  // 게시물 등록
+  const addFeed = (bid, bimg, cmt, content, date, email, following, lk, uid, uimg) => {
+    const a = {
+      bid: Number(bid),
+      bimg: bimg,
+      cmt: cmt,
+      content: content,
+      date: date,
+      email: email,
+      following: following,
+      lk: lk,
+      uid: uid,
+      uimg: uimg,
+    };
+    setFeed([a, ...feed]);
+  };
+
+  // 게시물삭제
+  const deleteFeed = (bid) => {
+    const newFeed = feed.filter((v) => bid != v.bid);
+    setFeed(newFeed);
+    console.log(feed);
+  };
+
+  //팔로우
+  const changeFollow = (f, uid) => {
+    const newFeed = feed.map((v) => {
+      if (v.uid === uid) {
+        if (f === "follow") {
+          v.following = "1";
+          console.log(v);
+        } else {
+          v.following = "0";
+          console.log(v);
+        }
+      }
+      return v;
+    });
+    setFeed(newFeed);
+  };
+
   return (
     <>
-      <MainBoard setFeed={setFeed} setPost={setPost} text={text} img={img} setText={setText} setImg={setImg} />
+      <MainBoard
+        setFeed={setFeed}
+        setPost={setPost}
+        text={text}
+        img={img}
+        setText={setText}
+        setImg={setImg}
+        addFeed={addFeed}
+      />
       <div className="main_post_out_wrap">
         <div>
           {cmtModal && (
@@ -105,6 +161,7 @@ function Main() {
             return (
               <div ref={lastPostRef} key={v.bid}>
                 <MainFeed
+                  deleteFeed={deleteFeed}
                   addCmt={addCmt}
                   follow={v.following}
                   uimg={v.uimg}
@@ -121,6 +178,7 @@ function Main() {
                   bid={v.bid}
                   commentIndex={commentIndex}
                   cmtList={v.cmt}
+                  changeFollow={changeFollow}
                 />
               </div>
             );
@@ -128,6 +186,7 @@ function Main() {
             return (
               <div key={v.bid}>
                 <MainFeed
+                  deleteFeed={deleteFeed}
                   follow={v.following}
                   uimg={v.uimg}
                   uuid={v.uid}
@@ -144,12 +203,13 @@ function Main() {
                   commentIndex={commentIndex}
                   cmtList={v.cmt}
                   addCmt={addCmt}
+                  changeFollow={changeFollow}
                 />
               </div>
             );
           }
         })}
-        {loading && <div>Loading...</div>}
+        {loading && <Loader />}
         {!hasMore && <div>No more posts</div>}
         <span onClick={TopBtnClick} className="upImg">
           <img style={{ width: "3vw" }} src={upBtn} alt=""></img>

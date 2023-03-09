@@ -7,11 +7,12 @@ import { useSelector } from "react-redux";
 import BoardProfile from "../Side/BoardProfile";
 
 function MainFeed({
+  changeLike,
+  deleteFeed,
   follow,
   uimg,
   uuid,
   email,
-  setFeed,
   commentIndex,
   setCmtModal,
   setCommentIndex,
@@ -21,13 +22,13 @@ function MainFeed({
   bid,
   addCmt,
   cmtList,
+  changeFollow,
 }) {
   const Post = useRef();
   const Comment = useRef();
   const [like, setLike] = useState(false);
   const [cmt, setCmt] = useState(cmtList || []);
   const [post, setPost] = useState([]);
-  const [following, setFollowing] = useState(!!Number(follow));
 
   //redux store 로그인시 userId저장했고 그 값을 받아옴
   const uid = useSelector((store) => {
@@ -55,16 +56,9 @@ function MainFeed({
       axios
         .delete(`http://13.125.96.165:3000/board/delete/${bid}?uid=${uid}`)
         .then((res) => {
+          console.log(res);
           alert("삭제완료");
-          axios
-            .get("http://13.125.96.165:3000/board/get/main")
-            .then((res) => {
-              console.log(res);
-              setFeed(res.data.content);
-            })
-            .catch((err) => {
-              alert(err);
-            });
+          deleteFeed(bid);
         })
         .catch((err) => console.log(err));
     }
@@ -84,13 +78,13 @@ function MainFeed({
 
   //팔로우 하기 , 팔로우 취소
   const followClick = () => {
-    if (following) {
+    if (!!Number(follow)) {
       axios
         .delete(`http://13.125.96.165:3000/profile/unfollow?follower=${uuid}&following=${userId}`)
         .then((res) => {
           if (res.data.message === "성공되었습니다.") {
             alert("팔로우 취소");
-            setFollowing(!following);
+            changeFollow("unfollow", uuid);
           }
           console.log(res);
         })
@@ -103,7 +97,7 @@ function MainFeed({
         })
         .then((res) => {
           if (res.data.message === "성공되었습니다.") {
-            setFollowing(!following);
+            changeFollow("follow", uuid);
             alert("팔로우 성공");
           }
           console.log(res);
@@ -123,7 +117,7 @@ function MainFeed({
           </div>
           <div>
             <button onClick={followClick} className="main_follow_button">
-              {following ? "Following" : "Follow"}
+              {!!Number(follow) ? "Following" : "Follow"}
             </button>
           </div>
         </div>
